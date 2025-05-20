@@ -2,24 +2,31 @@ import tkinter as tk
 from db import DB
 from config import TITLE, WINDOWS
 from datetime import datetime
+from classes.widgets import Widgets
 
 
-class NoteApp:
+class NoteApp(Widgets):
     def __init__(self, root):
         self.db = DB()
         self.root = root
         self.root.title(TITLE)
         self.root.geometry(WINDOWS)
         self.create_widgets()
+        self.load_notes()
 
-    def create_widgets(self):
-        self.list_frame = tk.Frame(self.root)
-        self.list_frame.pack(side=tk.LEFT, fill=tk.Y, padx=5, pady=5)
-        self.add_button = tk.Button(self.list_frame, text='Добавить заметку', command=self.add_note)
-        self.add_button.pack()
+    def load_notes(self):
+        for item in self.notes_list.get_children():
+            self.notes_list.delete(item)
 
-        self.delete_button = tk.Button(self.list_frame, text='Добавить заметку', command=self.delete_note, state=tk.DISABLED)
-        self.delete_button.pack()
+        notes = self.db.select_notes()
+        for id, title, created_at in notes:
+            self.notes_list.insert('', tk.END, values=(title, created_at), iid=id)
+
+    def save_button_(self):
+        pass
+
+    def on_note_select(self, event):
+        pass
 
     def add_note(self):
         pass
