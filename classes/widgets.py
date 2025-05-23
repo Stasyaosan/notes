@@ -48,6 +48,7 @@ class Widgets:
             command=self.save_button_,
             state=tk.DISABLED
         )
+        self.save_button.pack(fill=tk.X, pady=5)
 
         self.info_label = tk.Label(self.edit_frame, text='')
         self.info_label.pack(fill=tk.X)

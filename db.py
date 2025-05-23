@@ -21,11 +21,15 @@ class DB:
         self.cursor.execute('select * from notes order by updated_at desc')
         return self.cursor.fetchall()
 
+    def select_note_by_id(self, id_note):
+        self.cursor.execute('select * from notes where id = ?', (id_note,))
+        return self.cursor.fetchone()
+
     def add_notes(self, title, content, now):
-        self.cursor.execute('insert into notes (title, content, created_atm, update_ate) values (?,?,?,?)',
-                            (title, content, now))
+        self.cursor.execute('insert into notes (title, content, created_at, updated_at) values (?,?,?,?)',
+                            (title, content, now, now))
         self.conn.commit()
 
     def edit_notes(self, title, content, now, id_note):
-        self.cursor.execute('update notes set title = ?, update_at = ?, where id = ?', (title, content, now, id_note))
+        self.cursor.execute('update notes set title = ?, content = ?, updated_at = ? where id = ?', (title, content, now, id_note))
         self.conn.commit()
