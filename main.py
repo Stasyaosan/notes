@@ -1,9 +1,10 @@
 import tkinter as tk
-from db import DB
-from config import TITLE, WINDOWS
 from datetime import datetime
+from tkinter.messagebox import showerror, askyesno
+
 from classes.widgets import Widgets
-from tkinter.messagebox import showinfo, showerror
+from config import TITLE, WINDOWS
+from db import DB
 
 
 class NoteApp(Widgets):
@@ -69,6 +70,25 @@ class NoteApp(Widgets):
         self.delete_button.config(state=tk.DISABLED)
 
     def delete_note(self):
+        if not self.current_note_id:
+            return
+        if askyesno('', 'Удалить заметку?'):
+            self.db.delete_notes(self.current_note_id)
+            self.load_notes()
+
+    def show_mysql_settings(self):
+        mysql_window = tk.Toplevel(self.root)
+        mysql_window.title('Настройка Mysql')
+        mysql_window.geometry('400x300')
+        tk.Label(mysql_window, text='Host').grid(row=0, column=0, padx=5, pady=5)
+        host_entry = tk.Entry(mysql_window)
+        host_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        tk.Label(mysql_window, text='User').grid(row=1, column=0, padx=5, pady=5)
+        user_entry = tk.Entry(mysql_window)
+        user_entry.grid(row=1, column=1, padx=5, pady=5)
+
+    def export_to_mysql(self):
         pass
 
 

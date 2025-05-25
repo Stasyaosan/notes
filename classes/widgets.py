@@ -5,6 +5,18 @@ from tkinter import ttk
 class Widgets:
 
     def create_widgets(self):
+        self.menu_bar = tk.Menu(self.root)
+
+        self.file_menu = tk.Menu(self.menu_bar)
+        self.file_menu.add_command(label='Настройка Mysql', command=self.show_mysql_settings)
+        self.file_menu.add_command(label='Экспорт в Муsql', command=self.export_to_mysql)
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label='Выход', command=self.root.quit)
+
+        self.menu_bar.add_cascade(label='Настройки', menu=self.file_menu)
+
+        self.root.config(menu=self.menu_bar)
+
         self.list_frame = tk.Frame(self.root)
         self.list_frame.pack(side=tk.LEFT, fill=tk.Y, padx=5, pady=5)
         self.add_button = tk.Button(self.list_frame, text='Добавить заметку', command=self.add_note)

@@ -33,3 +33,7 @@ class DB:
     def edit_notes(self, title, content, now, id_note):
         self.cursor.execute('update notes set title = ?, content = ?, updated_at = ? where id = ?', (title, content, now, id_note))
         self.conn.commit()
+
+    def delete_notes(self, id_note):
+        self.cursor.execute('delete from notes where id = ?', (id_note,))
+        self.conn.commit()
