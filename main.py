@@ -1,10 +1,14 @@
 import tkinter as tk
 from datetime import datetime
-from tkinter.messagebox import showerror, askyesno
+from tkinter.messagebox import showerror, askyesno, showinfo
+import json
+
+import mysql.connector
 
 from classes.widgets import Widgets
 from config import TITLE, WINDOWS
 from db import DB
+from mysql_db import Mysql
 
 
 class NoteApp(Widgets):
@@ -80,16 +84,93 @@ class NoteApp(Widgets):
         mysql_window = tk.Toplevel(self.root)
         mysql_window.title('Настройка Mysql')
         mysql_window.geometry('400x300')
-        tk.Label(mysql_window, text='Host').grid(row=0, column=0, padx=5, pady=5)
-        host_entry = tk.Entry(mysql_window)
-        host_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        tk.Label(mysql_window, text='User').grid(row=1, column=0, padx=5, pady=5)
-        user_entry = tk.Entry(mysql_window)
-        user_entry.grid(row=1, column=1, padx=5, pady=5)
+        try:
+            with open('config_mysql.json', 'r', encoding='utf-8') as f:
+                data = json.load(f)
+        except:
+            data = {}
+
+        mysql_window.grab_set()
+        mysql_window.transient(self.root)
+        mysql_window.focus_set()
+
+        tk.Label(mysql_window, text='Host').grid(row=0, column=0, padx=5, pady=5)
+        self.host_entry = tk.Entry(mysql_window)
+        self.host_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.host_entry.insert(0, data.get('host', ''))
+
+        tk.Label(mysql_window, text='Port').grid(row=1, column=0, padx=5, pady=5)
+        self.port_entry = tk.Entry(mysql_window)
+        self.port_entry.grid(row=1, column=1, padx=5, pady=5)
+        self.port_entry.insert(0, '3306')
+        self.port_entry.insert(0, data.get('port', ''))
+
+        tk.Label(mysql_window, text='User').grid(row=2, column=0, padx=5, pady=5)
+        self.user_entry = tk.Entry(mysql_window)
+        self.user_entry.grid(row=2, column=1, padx=5, pady=5)
+        self.user_entry.insert(0, data.get('user', ''))
+
+        tk.Label(mysql_window, text='Password:').grid(row=3, column=0, padx=5, pady=5)
+        self.password_entry = tk.Entry(mysql_window, show='*')
+        self.password_entry.grid(row=3, column=1, padx=5, pady=5)
+        self.password_entry.insert(0, data.get('password', ''))
+
+        tk.Label(mysql_window, text='DB_name:').grid(row=4, column=0, padx=5, pady=5)
+        self.db_entry = tk.Entry(mysql_window, )
+        self.db_entry.grid(row=4, column=1, padx=5, pady=5)
+        self.db_entry.insert(0, data.get('db_name', ''))
+
+        self.save_button = tk.Button(mysql_window, text='Сохранить', command=self.save_settings)
+        self.save_button.grid(row=5, column=0, padx=5, pady=5)
+
+        self.test_button = tk.Button(mysql_window, text='Тест подключения',
+                                     command=self.test_mysql_connection)
+        self.test_button.grid(row=5, column=1, padx=5, pady=5)
+
+    def save_settings(self):
+        date = {
+            'host': self.host_entry.get(),
+            'user': self.user_entry.get(),
+            'password': self.password_entry.get(),
+            'db_name': self.db_entry.get()
+        }
+
+        with open('config_mysql.json', 'w', encoding='utf-8') as f:
+            json.dump(date, f, indent=4)
+
+    def test_mysql_connection(self):
+        try:
+            connection = mysql.connector.connect(host=self.host_entry.get(), user=self.user_entry.get(),
+                                                 password=self.password_entry.get(), db=self.db_entry.get(),
+                                                 port=self.port_entry.get())
+            if connection.is_connected():
+                self.test_button.config(state=tk.DISABLED)
+                showinfo('Success', 'Connection success')
+                connection.close()
+                return True
+            else:
+                showerror('Error', 'Error connection')
+                return False
+        except:
+            showerror('Error', 'Error connection')
+            return False
 
     def export_to_mysql(self):
-        pass
+        mysql = Mysql('config_mysql.json')
+        self.get_all_notes()
+
+    def get_all_notes(self):
+        data = []
+
+        for i in self.notes_list.get_children():
+            values = self.notes_list.item(i, 'values')
+            r = {
+                'title': values[0],
+                'created_at': values[1]
+            }
+            data.append(r)
+        print(data)
 
 
 a = tk.Tk()
