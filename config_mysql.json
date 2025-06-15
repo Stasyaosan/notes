@@ -2,5 +2,6 @@
     "host": "localhost",
     "user": "root",
     "password": "Av4936754",
-    "db_name": "notes"
+    "db_name": "notes",
+    "port": "3306"
 }
